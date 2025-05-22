@@ -15,7 +15,8 @@ class WindowDemoApp:
         
         tk.Label(self.root, text="Primary Window", font=("Arial", 12, "bold"), bg="white").pack(pady=10)
         
-        # Create buttons for different window types
+        # Create a list of all button options and their corresponding functions
+        # Each tuple contains (button text, function to call when clicked)
         buttons = [
             ("Open Dialog Box", self.open_dialog_box),
             ("Open Property Sheet", self.open_property_sheet),
@@ -25,19 +26,22 @@ class WindowDemoApp:
             ("Open Pop-up Window", self.open_popup_window)
         ]
         
+        # Create all buttons automatically from the list above
+        # This avoids having to write repetitive code for each button
         for text, command in buttons:
             tk.Button(self.root, text=text, command=command, bg="white", width=20).pack(pady=3)
 
     def create_window(self, title, size="300x150"):
         """Helper function to create standard window with header"""
+        # Create a new window that's connected to the main window (parent-child relationship)
         win = tk.Toplevel(self.root)
         win.title(title)
-        win.geometry(size)
+        win.geometry(size)  # Set window dimensions (width x height)
         win.configure(bg="white")
         
-        # Add header
+        # Add a black header bar at the top of each window for consistent design
         header = tk.Frame(win, bg="black", height=25)
-        header.pack(fill="x")
+        header.pack(fill="x")  # Make the header stretch across the full width
         tk.Label(header, text=title, fg="white", bg="black").pack(anchor="w", padx=5)
         
         return win
@@ -67,6 +71,8 @@ class WindowDemoApp:
         
         tk.Label(win, text="Property Inspector", bg="white", font=("Arial", 10, "bold")).pack(pady=5)
         
+        # Create multiple property fields dynamically using a loop
+        # This creates Property 1 and Property 2 with their respective text input fields
         for i in range(1, 3):
             frame = tk.Frame(win, bg="white")
             frame.pack(fill="x", padx=20, pady=5)
@@ -85,9 +91,9 @@ class WindowDemoApp:
         
         tk.Label(win, text="Choose an Option:", bg="white").pack(pady=5)
         
-        tk.Button(win, text="⬜", width=3, height=1, bg="white", 
+        tk.Button(win, text="", width=3, height=1, bg="white", 
                  command=lambda: self.open_palette_option("Option 1")).pack(pady=5)
-        tk.Button(win, text="🔺", width=3, height=1, bg="white",
+        tk.Button(win, text="", width=3, height=1, bg="white",
                  command=lambda: self.open_palette_option("Option 2")).pack(pady=5)
 
     def open_palette_option(self, option):
@@ -96,15 +102,19 @@ class WindowDemoApp:
         tk.Button(win, text="OK", command=win.destroy, width=10).pack()
 
     def open_popup_window(self):
+        # Create a special type of window that appears on top of everything else
         popup = tk.Toplevel(self.root)
         popup.title("Pop-up Window")
         popup.geometry("250x120")
         popup.configure(bg="white")
-        popup.overrideredirect(True)  # Remove window decorations
+        # Remove standard window borders and title bar to make it look like a true popup
+        popup.overrideredirect(True)  # This removes all window decorations
         
-        # Position popup
+        # Position popup relative to main window (100 pixels to the right and down)
+        # This ensures the popup appears near the main window instead of at a random location
         popup.geometry(f"+{self.root.winfo_x() + 100}+{self.root.winfo_y() + 100}")
         
+        # Create a frame with a black border to make the popup look like a floating panel
         frame = tk.Frame(popup, bg="white", highlightbackground="black", highlightthickness=1)
         frame.pack(fill="both", expand=True)
         

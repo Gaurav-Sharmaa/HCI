@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Recommender</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        h1, h3 { color: #2c3e50; text-align: center; }
+        form { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { display: flex; align-items: center; margin-bottom: 15px; }
+        .form-group label { width: 200px; text-align: right; padding-right: 15px; color: #2c3e50; font-weight: 500; }
+        input, button { padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+        input { flex: 1; max-width: 400px; }
+        .button-container { text-align: center; margin-top: 20px; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        ul { list-style-type: none; padding: 0; max-width: 600px; margin: 0 auto; }
+        li { background-color: white; margin: 8px 0; padding: 12px 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+        .movie-title { font-weight: bold; color: #e74c3c; }
+        .movie-score { color: #7f8c8d; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>🎬 Movie Recommender</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" min="8" max="100" required>
+        </div>
+        <div class="form-group">
+            <label for="likeness">Likeness (1-10):</label>
+            <input type="range" id="likeness" name="likeness" min="1" max="10" required>
+        </div>
+        <div class="form-group">
+            <label for="genres">Genres (e.g. Action|Comedy):</label>
+            <input type="text" id="genres" name="genres" required>
+        </div>
+        <div class="form-group">
+            <label for="language">Language:</label>
+            <input type="text" id="language" name="language" required>
+        </div>
+        <div class="button-container">
+            <button type="submit">Get Recommendations</button>
+        </div>
+    </form>
+
+    {% if results %}
+        <h3>Recommended Movies:</h3>
+        <ul>
+        {% for title, score in results %}
+            <li>
+                <span class="movie-title">{{ title }}</span>
+                <span class="movie-score">Score: {{ "%.1f"|format(score) }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

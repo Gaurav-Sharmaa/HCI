@@ -9,123 +9,78 @@ class CalculatorApp:
         self.root.geometry("400x600")
         self.root.resizable(False, False)
         
-        # Configure styles
-        self.bg_color = "#2E3440"
-        self.btn_color = "#3B4252"
-        self.btn_color_alt = "#4C566A"
-        self.text_color = "#E5E9F0"
-        self.accent_color = "#88C0D0"
-        self.display_color = "#3B4252"
+        # Base styles
+        self.bg_color, self.display_color = "#2E3440", "#3B4252"
+        self.btn_color, self.btn_color_alt = "#3B4252", "#4C566A"
+        self.text_color, self.accent_color = "#E5E9F0", "#88C0D0"
+        
+        # Mode settings
+        self.mode_settings = {
+            "young": ("#5E81AC", "#81A1C1", "#ECEFF4", 18, 6, 2),
+            "adult": ("#4C566A", "#434C5E", "#E5E9F0", 14, 6, 2),
+            "system": ("#3B4252", "#4C566A", "#E5E9F0", 12, 5, 2)
+        }
+        
+        # Scientific functions
+        self.sci_map = {
+            'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
+            'log': 'math.log10', 'ln': 'math.log', '√': 'math.sqrt'
+        }
         
         self.root.configure(bg=self.bg_color)
-        
-        # Create mode selection screen
-        self.create_mode_selection()
+        self.show_mode_selection()
     
-    def create_mode_selection(self):
-        # Clear existing widgets
-        for widget in self.root.winfo_children():
-            widget.destroy()
-        
-        # Create title
-        title_font = tkfont.Font(family="Helvetica", size=20, weight="bold")
-        title = tk.Label(self.root, text="Select Calculator Mode", font=title_font, 
-                         bg=self.bg_color, fg=self.accent_color)
-        title.pack(pady=30)
-        
-        # Create mode buttons
-        btn_font = tkfont.Font(family="Helvetica", size=14)
-        
-        user_centric_btn = tk.Button(self.root, text="User-Centric", font=btn_font,
-                                    bg=self.btn_color, fg=self.text_color,
-                                    command=self.user_centric_mode)
-        user_centric_btn.pack(pady=15, ipadx=20, ipady=10)
-        
-        system_centric_btn = tk.Button(self.root, text="System-Centric", font=btn_font,
-                                      bg=self.btn_color, fg=self.text_color,
-                                      command=self.system_centric_mode)
-        system_centric_btn.pack(pady=15, ipadx=20, ipady=10)
+    def clear_widgets(self):
+        for widget in self.root.winfo_children(): widget.destroy()
+    
+    def make_header(self, text):
+        tk.Label(self.root, text=text, font=tkfont.Font(family="Helvetica", size=20, weight="bold"),
+                bg=self.bg_color, fg=self.accent_color).pack(pady=30)
+    
+    def make_button(self, text, command, is_alt=False):
+        btn = tk.Button(self.root, text=text, font=tkfont.Font(family="Helvetica", size=14),
+                      bg=self.btn_color_alt if is_alt else self.btn_color, fg=self.text_color,
+                      command=command)
+        btn.pack(pady=15, ipadx=20, ipady=10)
+        return btn
+    
+    def show_mode_selection(self):
+        self.clear_widgets()
+        self.make_header("Select Calculator Mode")
+        self.make_button("User-Centric", self.user_centric_mode)
+        self.make_button("System-Centric", lambda: self.create_calculator("system"))
     
     def user_centric_mode(self):
-        # Clear existing widgets
-        for widget in self.root.winfo_children():
-            widget.destroy()
-        
-        # Create age selection screen
-        title_font = tkfont.Font(family="Helvetica", size=20, weight="bold")
-        title = tk.Label(self.root, text="Select Your Age Group", font=title_font, 
-                         bg=self.bg_color, fg=self.accent_color)
-        title.pack(pady=30)
-        
-        btn_font = tkfont.Font(family="Helvetica", size=14)
-        
-        young_btn = tk.Button(self.root, text="10-20 Years", font=btn_font,
-                             bg=self.btn_color, fg=self.text_color,
-                             command=lambda: self.create_calculator("young"))
-        young_btn.pack(pady=15, ipadx=20, ipady=10)
-        
-        adult_btn = tk.Button(self.root, text="20+ Years", font=btn_font,
-                            bg=self.btn_color, fg=self.text_color,
-                            command=lambda: self.create_calculator("adult"))
-        adult_btn.pack(pady=15, ipadx=20, ipady=10)
-        
-        back_btn = tk.Button(self.root, text="Back", font=btn_font,
-                           bg=self.btn_color_alt, fg=self.text_color,
-                           command=self.create_mode_selection)
-        back_btn.pack(pady=15, ipadx=20, ipady=10)
-    
-    def system_centric_mode(self):
-        self.create_calculator("system")
+        self.clear_widgets()
+        self.make_header("Select Your Age Group")
+        self.make_button("10-20 Years", lambda: self.create_calculator("young"))
+        self.make_button("20+ Years", lambda: self.create_calculator("adult"))
+        self.make_button("Back", self.show_mode_selection, True)
     
     def create_calculator(self, mode):
-        # Clear existing widgets
-        for widget in self.root.winfo_children():
-            widget.destroy()
+        self.clear_widgets()
         
-        # Initialize calculator variables
+        # Initialize calculator state
         self.current_input = ""
         self.total_expression = ""
         self.display_var = tk.StringVar()
-        self.scientific_mode = False
         
-        # Adjust UI based on mode
-        if mode == "young":
-            self.btn_color = "#5E81AC"
-            self.btn_color_alt = "#81A1C1"
-            self.text_color = "#ECEFF4"
-            button_font = tkfont.Font(family="Helvetica", size=18)
-            button_width = 6
-            button_height = 2
-        elif mode == "adult":
-            self.btn_color = "#4C566A"
-            self.btn_color_alt = "#434C5E"
-            self.text_color = "#E5E9F0"
-            button_font = tkfont.Font(family="Helvetica", size=14)
-            button_width = 6
-            button_height = 2
-        else:  # system
-            self.btn_color = "#3B4252"
-            self.btn_color_alt = "#4C566A"
-            self.text_color = "#E5E9F0"
-            button_font = tkfont.Font(family="Helvetica", size=12)
-            button_width = 5
-            button_height = 2
+        # Apply mode settings
+        self.btn_color, self.btn_color_alt, self.text_color, font_size, btn_w, btn_h = self.mode_settings[mode]
+        button_font = tkfont.Font(family="Helvetica", size=font_size)
         
-        # Create display frame
+        # Create display
         display_frame = tk.Frame(self.root, height=100, bg=self.display_color)
         display_frame.pack(expand=True, fill="both", padx=10, pady=10)
+        tk.Label(display_frame, textvariable=self.display_var, anchor="e", 
+                bg=self.display_color, fg=self.text_color,
+                font=tkfont.Font(family="Helvetica", size=24)).pack(expand=True, fill="both", padx=20, pady=5)
         
-        # Display for total expression
-        total_label = tk.Label(display_frame, textvariable=self.display_var, 
-                              anchor="e", bg=self.display_color, fg=self.text_color,
-                              font=tkfont.Font(family="Helvetica", size=24))
-        total_label.pack(expand=True, fill="both", padx=20, pady=5)
-        
-        # Create button frame
+        # Create button grid
         button_frame = tk.Frame(self.root, bg=self.bg_color)
         button_frame.pack(expand=True, fill="both", padx=10, pady=10)
         
-        # Button layout
+        # Define button layout
         buttons = [
             ('7', '8', '9', '/', '⌫'),
             ('4', '5', '6', 'x', 'C'),
@@ -135,84 +90,75 @@ class CalculatorApp:
         
         # Add scientific buttons for system mode
         if mode == "system":
-            buttons.insert(0, ('sin', 'cos', 'tan', '^', '√'))
-            buttons.insert(1, ('log', 'ln', 'π', 'e', 'Sci'))
+            buttons = [('sin', 'cos', 'tan', '^', '√'), ('log', 'ln', 'π', 'e', 'Sci')] + buttons
         
         # Create buttons
         for i, row in enumerate(buttons):
-            for j, button_text in enumerate(row):
-                button = tk.Button(button_frame, text=button_text, font=button_font,
-                                 bg=self.btn_color, fg=self.text_color,
-                                 command=lambda x=button_text: self.on_button_click(x))
-                button.grid(row=i, column=j, padx=5, pady=5, 
-                           sticky="nsew", ipadx=button_width, ipady=button_height)
+            for j, btn_text in enumerate(row):
+                btn = tk.Button(button_frame, text=btn_text, font=button_font,
+                             bg=self.btn_color, fg=self.text_color,
+                             command=lambda x=btn_text: self.on_button_click(x))
+                btn.grid(row=i, column=j, padx=5, pady=5, sticky="nsew", ipadx=btn_w, ipady=btn_h)
                 button_frame.grid_columnconfigure(j, weight=1)
             button_frame.grid_rowconfigure(i, weight=1)
         
         # Add back button
-        back_btn = tk.Button(self.root, text="Back", font=button_font,
-                           bg=self.btn_color_alt, fg=self.text_color,
-                           command=self.create_mode_selection)
-        back_btn.pack(pady=10, ipadx=10, ipady=5)
+        tk.Button(self.root, text="Back", font=button_font, bg=self.btn_color_alt, fg=self.text_color,
+                command=self.show_mode_selection).pack(pady=10, ipadx=10, ipady=5)
         
         self.update_display()
     
-    def on_button_click(self, button_text):
-        if button_text == 'C':
-            self.current_input = ""
-            self.total_expression = ""
-        elif button_text == '⌫':
+    def on_button_click(self, btn):
+        if btn == 'C':
+            self.current_input = self.total_expression = ""
+        elif btn == '⌫':
             self.current_input = self.current_input[:-1]
-        elif button_text == '=':
+        elif btn == '=':
             try:
-                # Replace special constants
-                expression = self.total_expression.replace('π', str(math.pi)).replace('e', str(math.e))
+                # Process expression
+                expr = self.total_expression.replace('π', str(math.pi)).replace('e', str(math.e))
                 
-                # Handle scientific functions
-                if 'sin(' in expression:
-                    expression = expression.replace('sin(', 'math.sin(')
-                if 'cos(' in expression:
-                    expression = expression.replace('cos(', 'math.cos(')
-                if 'tan(' in expression:
-                    expression = expression.replace('tan(', 'math.tan(')
-                if 'log(' in expression:
-                    expression = expression.replace('log(', 'math.log10(')
-                if 'ln(' in expression:
-                    expression = expression.replace('ln(', 'math.log(')
-                if '√(' in expression:
-                    expression = expression.replace('√(', 'math.sqrt(')
-                if '^' in expression:
-                    expression = expression.replace('^', '**')
+                # Replace multiplication symbol 'x' with '*'
+                expr = expr.replace('x', '*')
                 
-                result = str(eval(expression))
-                self.total_expression = result
-                self.current_input = result
+                # Replace scientific functions
+                for func, math_func in self.sci_map.items():
+                    if func + '(' in expr:
+                        expr = expr.replace(func + '(', math_func + '(')
+                
+                # Handle power operator
+                if '^' in expr: expr = expr.replace('^', '**')
+                
+                # Calculate result
+                result = str(eval(expr))
+                self.current_input = self.total_expression = result
             except Exception:
                 self.current_input = "Error"
                 self.total_expression = ""
-        elif button_text == 'Sci':
-            self.scientific_mode = not self.scientific_mode
+        elif btn == 'Sci':
             self.create_calculator("system")
         else:
-            if button_text in ['sin', 'cos', 'tan', 'log', 'ln', '√']:
-                self.current_input += button_text + '('
+            # Handle input of operators and functions
+            if btn in self.sci_map:
+                self.current_input += btn + '('
             else:
-                self.current_input += str(button_text)
+                self.current_input += str(btn)
             self.total_expression = self.current_input
         
         self.update_display()
     
     def update_display(self):
         self.display_var.set(self.total_expression)
-        if len(self.display_var.get()) > 15:
-            display_font = tkfont.Font(family="Helvetica", size=18)
-        else:
-            display_font = tkfont.Font(family="Helvetica", size=24)
+        # Adjust font size based on content length
+        size = 18 if len(self.display_var.get()) > 15 else 24
+        font = tkfont.Font(family="Helvetica", size=size)
         
-        for widget in self.root.winfo_children():
-            if isinstance(widget, tk.Frame) and len(widget.winfo_children()) > 0:
-                if isinstance(widget.winfo_children()[0], tk.Label):
-                    widget.winfo_children()[0].config(font=display_font)
+        # Update display label font
+        for w in self.root.winfo_children():
+            if isinstance(w, tk.Frame) and w.winfo_children():
+                label = w.winfo_children()[0]
+                if isinstance(label, tk.Label):
+                    label.config(font=font)
 
 # Create and run the application
 if __name__ == "__main__":
